@@ -1,0 +1,80 @@
+TITLE: San Diego County Veterans Density
+UID: 011ef7d4-fc3e-4588-8746-cea19e0448e8
+DIR: veterans
+DATABASE: spatialite:veterans.db 
+PUBLICATION: s3://warehouse.sandiegodata.org/vosd
+ACCESS: public
+
+
+This dataset combines the boundaries, veterans estimate, and geofile from the 2012 5 year ACS, along with the Veteran Administration's 30 years estimates of veteran population by county. THe data is presented as a CSV file, and a shapefile. 
+
+The `total_pop_acs12` column is the total popluation for the county, estimated in the 2012 ACS. The `veterans_acs_12` column is the estimate of the number of veterand in the county, from ACS table B21001. 
+
+The Population Density, `pop_density`, is in people per square kilometer, using the 2012 ACS total population estimate, and the 2012 ACS value for the area of land ( excluding water ) in the county. The `vet_frac` columns is the  fractino of the population that are veterans, calculated by dividing `veterans_acs_12` by `total_pop_acs12` .
+
+## Files
+
+EXTRACT: vetpop AS csv TO county_veteran_pop.csv
+EXTRACT: vetpop AS shapefile TO county_veteran_pop
+
+PARTITIONS:
+
+census.gov-acs-geo-p5ye2012-geofile-0.0.3
+census.gov-acs-p5ye2012-b00001-estimates-0.0.4
+census.gov-acs-p5ye2012-b01001-estimates-0.0.4
+census.gov-acs-p5ye2012-b01001-margins-0.0.4
+census.gov-acs-p5ye2012-b21001-estimates-0.0.4
+census.gov-acs-p5ye2012-b21001-margins-0.0.4
+census.gov-acs-p5ye2012-b09001-estimates-0.0.4
+census.gov-tigerline-2012-counties-geo-0.0.4 
+census.gov-vet_pop-2010e2040-vetpop-0.0.2
+
+# Area is transformed to EPSG, 26946, so area units should be square meters. 
+
+DOC:
+
+## Vetpop table
+
+For the vetpop table:
+* `sample_count_acs12`: The 'unweighted sample count', number of people actually surveyed to produce the estimates
+* `total_pop_acs12`: An estimate of the total population.
+* `total_pop_acs12_moe`: Margin of error for total_pop_acs12
+* `civ18_pop_acs12`: The estimate of the number of civilians 18 or older. 
+* `pop_density`: `total_pop_acs12` divided by the land area of the county. 
+* `veterans_acs_12`: An estimate of the number of veterans. 
+* `vet_frac`: `veterans_acs_12` divided by `civ18_pop_acs12`
+* `u18_pop_acs12`: Population under 18 years old
+* `o18_pop_acs12`: Population 18 years old or older
+
+The geometries are simlified to reduce the shapefile size ( over 100M normally ) with a tolerance of .001 degree, which is about a kilometer. 
+
+MVIEW: vetpop
+
+SELECT
+    geo.county, geo.state, geo.name, geo.stusab, geo.logrecno,
+    CAST(Area(Transform(counties.geometry,26946)) AS REAL) AS area,
+    SimplifyPreserveTopology(Transform(counties.geometry,4326), .001) as geometry,
+    B00001001 as sample_count_acs12,
+    b01001e.B01001001 as total_pop_acs12,
+    b01001m.B01001001 as total_pop_acs12_moe,
+    b02001e.B21001001 as civ18_pop_acs12,
+    b02001m.B21001001 as civ18_pop_acs12_moe,
+    b09001e.B09001001 as u18_pop_acs12,
+    b01001e.B01001001 - b09001e.B09001001 as o18_pop_acs12,
+    CAST(b01001e.B01001001*1000000/counties.arealand AS REAL) AS pop_density,
+    b02001e.B21001002 as veterans_acs_12,
+    CAST(b02001e.B21001002*1.0/b02001e.B21001001 AS REAL) AS vet_frac,
+    vetpop.*
+FROM d02G003_geofile AS geo
+JOIN d024004_b00001_estimates AS b00001e ON geo.stusab = b00001e.stusab AND geo.logrecno = b00001e.logrecno
+JOIN d024004_b01001_estimates AS b01001e ON geo.stusab = b01001e.stusab AND geo.logrecno = b01001e.logrecno
+JOIN d024004_b01001_margins   AS b01001m ON geo.stusab = b01001m.stusab AND geo.logrecno = b01001m.logrecno
+JOIN d024004_b21001_estimates AS b02001e ON geo.stusab = b02001e.stusab AND geo.logrecno = b02001e.logrecno
+JOIN d024004_b21001_margins   AS b02001m ON geo.stusab = b02001m.stusab AND geo.logrecno = b02001m.logrecno
+JOIN d024004_b09001_estimates AS b09001e ON geo.stusab = b09001e.stusab AND geo.logrecno = b09001e.logrecno
+JOIN d025004_counties AS counties ON counties.statefp = geo.state AND counties.countyfp = geo.county
+JOIN d02N002_vetpop AS vetpop ON vetpop.state = geo.state AND vetpop.county = geo.county
+WHERE geo.sumlevel = 50;
+
+
+

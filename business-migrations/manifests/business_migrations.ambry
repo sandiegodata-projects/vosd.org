@@ -1,0 +1,14 @@
+DIR: cabusmigrations
+DATABASE: sqlite:cabusmigrations.db 
+PUBLICATION: s3://warehouse.sandiegodata.org/vosd#compress
+UID: 134675d9-2845-458b-a153-3a3ab1d2dec7
+TITLE: California Business Migrations
+ACCESS: private-data
+
+# Files
+
+EXTRACT:d02O001_migrations AS csv TO camigrations.csv
+
+PARTITIONS:
+
+exceptionalgrowth.org-nets-ca-migrations-0.0.1
