@@ -1,24 +1,50 @@
-df = read.csv('~/Desktop/DSD_time_to_issue.csv')
-df$X = NULL
+setwd("~/vosd.org/215-opendsd")
+
+df = read.csv('approval_master.csv')
+
+df = subset(df, df$Type == 'Building Permit')
+df = df[c('ProjectId','TimetoIssue','Latitude','Longitude','ApplicationYear')]
+df = subset(df, df$Longitude < -116.8)
+
+
+#length(unique(df$ProjectId))
+#rev(sort(table(df$ProjectId)))[1:10]
+
+#big.project = subset(df, df$ProjectId == 301767)
+#big.project
+
+project_count = rle(sort(c(as.character(df$ProjectId))))
+df$project_count = project_count[[1]][match(df$ProjectId, project_count[[2]])]
+
+
+
+library(plyr)
+
+
+
 
 ################
 ## BI party ####
 ################
 
-library(plyr)
+#library(plyr)
 
-rev(sort(table(df$Type)))
+#rev(sort(table(df$Type)))
 
-bau = subset(df, df$Type == 'Combination Building Permit' | df$Type == 'Building Permit')
+#bau = subset(df, df$Type == 'Combination Building Permit' | df$Type == 'Building Permit')
+
+bau = df
+
 
 north.south = bau
 north.south['lat.bin'] = cut(north.south$Latitude, 2)
 
 by.loc.ns = ddply(north.south, c('lat.bin'), 
                   summarize,
-                  mean.dti = mean(DaystoIssue),
+                  mean.dti = mean(TimetoIssue),
                   Latitude = mean(Latitude),
-                  Longitude = mean(Longitude))
+                  Longitude = mean(Longitude),
+                  Count = mean(project_count))
 
 
 
@@ -27,9 +53,10 @@ east.west['lon.bin'] = cut(east.west$Longitude, 2)
 
 by.loc.ew = ddply(east.west, c('lon.bin'), 
                   summarize,
-                  mean.dti = mean(DaystoIssue),
+                  mean.dti = mean(TimetoIssue),
                   Latitude = mean(Latitude),
-                  Longitude = mean(Longitude))
+                  Longitude = mean(Longitude),
+                  Count = mean(project_count))
 
 four.bins = bau
 four.bins['lat.bin'] = cut(four.bins$Latitude, 2)
@@ -38,9 +65,10 @@ four.bins['square'] = paste(as.character(four.bins$lat.bin), as.character(four.b
 
 by.loc.4 = ddply(four.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(DaystoIssue),
+                  mean.dti = mean(TimetoIssue),
                  Latitude = mean(Latitude),
-                 Longitude = mean(Longitude))
+                 Longitude = mean(Longitude),
+                 Count = mean(project_count))
 
 eight.bins = bau
 eight.bins['lat.bin'] = cut(eight.bins$Latitude, 4)
@@ -49,9 +77,10 @@ eight.bins['square'] = paste(as.character(eight.bins$lat.bin), as.character(eigh
 
 by.loc.8 = ddply(eight.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(DaystoIssue),
+                  mean.dti = mean(TimetoIssue),
                  Latitude = mean(Latitude),
-                 Longitude = mean(Longitude))
+                 Longitude = mean(Longitude),
+                 Count = mean(project_count))
 
 sixteen.bins = bau
 sixteen.bins['lat.bin'] = cut(sixteen.bins$Latitude, 4)
@@ -60,9 +89,10 @@ sixteen.bins['square'] = paste(as.character(sixteen.bins$lat.bin), as.character(
 
 by.loc.16 = ddply(sixteen.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(DaystoIssue),
+                  mean.dti = mean(TimetoIssue),
                   Latitude = mean(Latitude),
-                  Longitude = mean(Longitude))
+                  Longitude = mean(Longitude),
+                  Count = mean(project_count))
 
 thirtytwo.bins = bau
 thirtytwo.bins['lat.bin'] = cut(thirtytwo.bins$Latitude, 8)
@@ -71,9 +101,10 @@ thirtytwo.bins['square'] = paste(as.character(thirtytwo.bins$lat.bin), as.charac
 
 by.loc.32 = ddply(thirtytwo.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(DaystoIssue),
+                  mean.dti = mean(TimetoIssue),
                   Latitude = mean(Latitude),
-                  Longitude = mean(Longitude))
+                  Longitude = mean(Longitude),
+                  Count = mean(project_count))
 
 sixtyfour.bins = bau
 sixtyfour.bins['lat.bin'] = cut(sixtyfour.bins$Latitude, 8)
@@ -82,15 +113,86 @@ sixtyfour.bins['square'] = paste(as.character(sixtyfour.bins$lat.bin), as.charac
 
 by.loc.64 = ddply(sixtyfour.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(DaystoIssue),
+                  mean.dti = mean(TimetoIssue),
                   Latitude = mean(Latitude),
-                  Longitude = mean(Longitude))
+                  Longitude = mean(Longitude),
+                  Count = mean(project_count))
+
+onetwentyeight.bins = bau
+onetwentyeight.bins['lat.bin'] = cut(onetwentyeight.bins$Latitude, 16)
+onetwentyeight.bins['lon.bin'] = cut(onetwentyeight.bins$Longitude, 8)
+onetwentyeight.bins['square'] = paste(as.character(onetwentyeight.bins$lat.bin), as.character(onetwentyeight.bins$lon.bin))
+
+by.loc.128 = ddply(onetwentyeight.bins, c('square'), 
+                  summarize,
+                  mean.dti = mean(TimetoIssue),
+                  Latitude = mean(Latitude),
+                  Longitude = mean(Longitude),
+                  Count = mean(project_count))
+
+
+twofiftysix.bins = bau
+twofiftysix.bins['lat.bin'] = cut(twofiftysix.bins$Latitude, 16)
+twofiftysix.bins['lon.bin'] = cut(twofiftysix.bins$Longitude, 16)
+twofiftysix.bins['square'] = paste(as.character(twofiftysix.bins$lat.bin), as.character(twofiftysix.bins$lon.bin))
+
+by.loc.256 = ddply(twofiftysix.bins, c('square'), 
+                   summarize,
+                   mean.dti = mean(TimetoIssue),
+                   Latitude = mean(Latitude),
+                   Longitude = mean(Longitude),
+                   Count = mean(project_count))
+
+
+
+fivetwelve.bins = bau
+fivetwelve.bins['lat.bin'] = cut(fivetwelve.bins$Latitude, 32)
+fivetwelve.bins['lon.bin'] = cut(fivetwelve.bins$Longitude, 16)
+fivetwelve.bins['square'] = paste(as.character(fivetwelve.bins$lat.bin), as.character(fivetwelve.bins$lon.bin))
+
+by.loc.512 = ddply(fivetwelve.bins, c('square'), 
+                   summarize,
+                   mean.dti = mean(TimetoIssue),
+                   Latitude = mean(Latitude),
+                   Longitude = mean(Longitude),
+                   Count = mean(project_count))
+
+
+tentwentyfour.bins = bau
+tentwentyfour.bins['lat.bin'] = cut(tentwentyfour.bins$Latitude, 32)
+tentwentyfour.bins['lon.bin'] = cut(tentwentyfour.bins$Longitude, 32)
+tentwentyfour.bins['square'] = paste(as.character(tentwentyfour.bins$lat.bin), as.character(tentwentyfour.bins$lon.bin))
+
+by.loc.1024 = ddply(tentwentyfour.bins, c('square'), 
+                   summarize,
+                   mean.dti = mean(TimetoIssue),
+                   Latitude = mean(Latitude),
+                   Longitude = mean(Longitude),
+                   Count = mean(project_count))
+
+
+twentyfortyeight.bins = bau
+twentyfortyeight.bins['lat.bin'] = cut(twentyfortyeight.bins$Latitude, 64)
+twentyfortyeight.bins['lon.bin'] = cut(twentyfortyeight.bins$Longitude, 32)
+twentyfortyeight.bins['square'] = paste(as.character(twentyfortyeight.bins$lat.bin), as.character(twentyfortyeight.bins$lon.bin))
+
+by.loc.2048 = ddply(twentyfortyeight.bins, c('square'), 
+                    summarize,
+                    mean.dti = mean(TimetoIssue),
+                    Latitude = mean(Latitude),
+                    Longitude = mean(Longitude),
+                    Count = mean(project_count))
+
+
+
+
 
 
 library(ggplot2)
 
 ggplot(df, aes(x=Longitude, y=Latitude)) +
   geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
   theme(panel.background = element_rect(fill = "grey21"),
         panel.grid.major = element_line(color = "grey21"),
         panel.grid.minor = element_line(color = "grey21"),
@@ -99,12 +201,11 @@ ggplot(df, aes(x=Longitude, y=Latitude)) +
         axis.text = element_text(size=rel(.7), color='white'),
         text = element_text(family='arial', face='plain', color='white', size = 14)) +
   labs(x='LONGITUDE',y='LATITUDE') +
-  geom_point(data=by.loc.64, aes(color=mean.dti), size=14)
+  geom_point(data=by.loc.2048[by.loc.2048$mean.dti < 250,], aes(color=mean.dti), size=4.9, alpha = .91)
 
 
 
-
-
+#
 
 
 
@@ -314,18 +415,6 @@ df['square'] = as.factor(df$square)
 anova(lm(data=df, DaystoIssue~Type+square))
 
 
-
-
-
-
-
-
-david = subset(df, df$IssuedBy == 'Saborio, David')
-qplot(david$Type)
-
-ggplot(df, aes(x=Longitude, y= Latitude)) +
-  geom_point(color='white', size=1) +
-  geom_point(data=david, color='lightblue', size=2)
 
 
 
