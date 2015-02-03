@@ -2,9 +2,46 @@ setwd("~/vosd.org/215-opendsd")
 
 df = read.csv('approval_master.csv')
 
-df = subset(df, df$Type == 'Building Permit')
-df = df[c('ProjectId','TimetoIssue','Latitude','Longitude','ApplicationYear')]
+anova(lm(data=df, TimetoIssue ~ factor(category)))
+summary(lm(data=df, TimetoIssue ~ factor(category)))
+
+anova(lm(data=df, TimetoIssue ~ factor(ApplicationYear)))
+summary(lm(data=df, TimetoIssue ~ factor(ApplicationYear)))
+
+anova(lm(data=df, TimetoIssue ~ factor(category) + factor(ApplicationYear)))
+
+anova(lm(data=df, TimetoIssue ~ factor(ApplicationMonth)))
+summary(lm(data=df, TimetoIssue ~ factor(ApplicationMonth)))
+
+
+discretionary = subset(df, df$category == 'Discretionary') 
+pm_count = rle(sort(c(as.character(discretionary$ProjectManager))))
+discretionary$pm_count = pm_count[[1]][match(discretionary$ProjectManager, pm_count[[2]])]
+
+discretionary_vets = subset(discretionary, discretionary$pm_count > 100) 
+
+anova(lm(data=discretionary_vets, TimetoIssue ~ factor(ProjectManager)))
+summary(lm(data=discretionary_vets, TimetoIssue ~ factor(ProjectManager)))
+
+
+anova(lm(data=discretionary_vets, TimetoIssue ~ factor(Type) + factor(ApplicationYear) + factor(ProjectManager)))
+summary(lm(data=discretionary_vets, TimetoIssue ~ factor(Type) + factor(ApplicationYear) + factor(ProjectManager)))
+
+
+
+
+
+
+###################
+## Bldg Maps ######
+###################
+
+
+bau = subset(df, df$Type == 'Building Permit')
+bau = bau[c('ProjectId','TimetoIssue','Latitude','Longitude','ApplicationYear')]
+
 df = subset(df, df$Longitude < -116.8)
+bau = subset(bau, bau$Longitude < -116.8)
 
 
 #length(unique(df$ProjectId))
@@ -13,27 +50,12 @@ df = subset(df, df$Longitude < -116.8)
 #big.project = subset(df, df$ProjectId == 301767)
 #big.project
 
-project_count = rle(sort(c(as.character(df$ProjectId))))
-df$project_count = project_count[[1]][match(df$ProjectId, project_count[[2]])]
+project_count = rle(sort(c(as.character(bau$ProjectId))))
+bau$project_count = project_count[[1]][match(bau$ProjectId, project_count[[2]])]
 
 
 
 library(plyr)
-
-
-
-
-################
-## BI party ####
-################
-
-#library(plyr)
-
-#rev(sort(table(df$Type)))
-
-#bau = subset(df, df$Type == 'Combination Building Permit' | df$Type == 'Building Permit')
-
-bau = df
 
 
 north.south = bau
@@ -41,7 +63,7 @@ north.south['lat.bin'] = cut(north.south$Latitude, 2)
 
 by.loc.ns = ddply(north.south, c('lat.bin'), 
                   summarize,
-                  mean.dti = mean(TimetoIssue),
+                  TimetoIssue = median(TimetoIssue),
                   Latitude = mean(Latitude),
                   Longitude = mean(Longitude),
                   Count = mean(project_count))
@@ -53,7 +75,7 @@ east.west['lon.bin'] = cut(east.west$Longitude, 2)
 
 by.loc.ew = ddply(east.west, c('lon.bin'), 
                   summarize,
-                  mean.dti = mean(TimetoIssue),
+                  TimetoIssue = median(TimetoIssue),
                   Latitude = mean(Latitude),
                   Longitude = mean(Longitude),
                   Count = mean(project_count))
@@ -65,7 +87,7 @@ four.bins['square'] = paste(as.character(four.bins$lat.bin), as.character(four.b
 
 by.loc.4 = ddply(four.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(TimetoIssue),
+                 TimetoIssue = median(TimetoIssue),
                  Latitude = mean(Latitude),
                  Longitude = mean(Longitude),
                  Count = mean(project_count))
@@ -77,7 +99,7 @@ eight.bins['square'] = paste(as.character(eight.bins$lat.bin), as.character(eigh
 
 by.loc.8 = ddply(eight.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(TimetoIssue),
+                 TimetoIssue = median(TimetoIssue),
                  Latitude = mean(Latitude),
                  Longitude = mean(Longitude),
                  Count = mean(project_count))
@@ -89,7 +111,7 @@ sixteen.bins['square'] = paste(as.character(sixteen.bins$lat.bin), as.character(
 
 by.loc.16 = ddply(sixteen.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(TimetoIssue),
+                  TimetoIssue = median(TimetoIssue),
                   Latitude = mean(Latitude),
                   Longitude = mean(Longitude),
                   Count = mean(project_count))
@@ -101,7 +123,7 @@ thirtytwo.bins['square'] = paste(as.character(thirtytwo.bins$lat.bin), as.charac
 
 by.loc.32 = ddply(thirtytwo.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(TimetoIssue),
+                  TimetoIssue = median(TimetoIssue),
                   Latitude = mean(Latitude),
                   Longitude = mean(Longitude),
                   Count = mean(project_count))
@@ -113,7 +135,7 @@ sixtyfour.bins['square'] = paste(as.character(sixtyfour.bins$lat.bin), as.charac
 
 by.loc.64 = ddply(sixtyfour.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(TimetoIssue),
+                  TimetoIssue = median(TimetoIssue),
                   Latitude = mean(Latitude),
                   Longitude = mean(Longitude),
                   Count = mean(project_count))
@@ -125,7 +147,7 @@ onetwentyeight.bins['square'] = paste(as.character(onetwentyeight.bins$lat.bin),
 
 by.loc.128 = ddply(onetwentyeight.bins, c('square'), 
                   summarize,
-                  mean.dti = mean(TimetoIssue),
+                  TimetoIssue = median(TimetoIssue),
                   Latitude = mean(Latitude),
                   Longitude = mean(Longitude),
                   Count = mean(project_count))
@@ -138,7 +160,7 @@ twofiftysix.bins['square'] = paste(as.character(twofiftysix.bins$lat.bin), as.ch
 
 by.loc.256 = ddply(twofiftysix.bins, c('square'), 
                    summarize,
-                   mean.dti = mean(TimetoIssue),
+                   TimetoIssue = median(TimetoIssue),
                    Latitude = mean(Latitude),
                    Longitude = mean(Longitude),
                    Count = mean(project_count))
@@ -152,7 +174,7 @@ fivetwelve.bins['square'] = paste(as.character(fivetwelve.bins$lat.bin), as.char
 
 by.loc.512 = ddply(fivetwelve.bins, c('square'), 
                    summarize,
-                   mean.dti = mean(TimetoIssue),
+                   TimetoIssue = median(TimetoIssue),
                    Latitude = mean(Latitude),
                    Longitude = mean(Longitude),
                    Count = mean(project_count))
@@ -165,7 +187,7 @@ tentwentyfour.bins['square'] = paste(as.character(tentwentyfour.bins$lat.bin), a
 
 by.loc.1024 = ddply(tentwentyfour.bins, c('square'), 
                    summarize,
-                   mean.dti = mean(TimetoIssue),
+                   TimetoIssue = median(TimetoIssue),
                    Latitude = mean(Latitude),
                    Longitude = mean(Longitude),
                    Count = mean(project_count))
@@ -178,7 +200,7 @@ twentyfortyeight.bins['square'] = paste(as.character(twentyfortyeight.bins$lat.b
 
 by.loc.2048 = ddply(twentyfortyeight.bins, c('square'), 
                     summarize,
-                    mean.dti = mean(TimetoIssue),
+                    TimetoIssue = median(TimetoIssue),
                     Latitude = mean(Latitude),
                     Longitude = mean(Longitude),
                     Count = mean(project_count))
@@ -201,11 +223,217 @@ ggplot(df, aes(x=Longitude, y=Latitude)) +
         axis.text = element_text(size=rel(.7), color='white'),
         text = element_text(family='arial', face='plain', color='white', size = 14)) +
   labs(x='LONGITUDE',y='LATITUDE') +
-  geom_point(data=by.loc.2048[by.loc.2048$mean.dti < 250,], aes(color=mean.dti), size=4.9, alpha = .91)
+  geom_point(data=by.loc.ns, aes(color=TimetoIssue), size=91, alpha = .42)
 
 
 
-#
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.ew, aes(color=TimetoIssue), size=63, alpha = .42)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.4, aes(color=TimetoIssue), size=63, alpha = .42)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.8, aes(color=TimetoIssue), size=56, alpha = .42)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.16, aes(color=TimetoIssue), size=42, alpha = .42)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.32, aes(color=TimetoIssue), size=42, alpha = .56)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.64, aes(color=TimetoIssue), size=21, alpha = .63)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.128, aes(color=TimetoIssue), size=21, alpha = .63)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.256, aes(color=TimetoIssue), size=14, alpha = .63)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.512, aes(color=TimetoIssue), size=14, alpha = .63)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.1024, aes(color=TimetoIssue), size=7, alpha = .77)
+
+
+ggplot(df, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  scale_color_gradient(low = 'green', high = 'red') +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE') +
+  geom_point(data=by.loc.2048, aes(color=TimetoIssue), size=7, alpha = .77)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
