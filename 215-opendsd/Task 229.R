@@ -38,7 +38,7 @@ summary(lm(data=discretionary_vets, TimetoIssue ~ factor(Type) + factor(Applicat
 
 
 bau = subset(df, df$Type == 'Building Permit')
-bau = bau[c('ProjectId','TimetoIssue','Latitude','Longitude','ApplicationYear')]
+bau = bau[c('ProjectId','TimetoIssue','Latitude','Longitude','ApplicationYear','IssueYear')]
 
 df = subset(df, df$Longitude < -116.8)
 bau = subset(bau, bau$Longitude < -116.8)
@@ -441,19 +441,19 @@ ggplot(df, aes(x=Longitude, y=Latitude)) +
 
 
 
-rev(sort(table(df$issY)))
+rev(sort(table(df$IssueYear)))
 
-four = bau[bau$issY==2004,]
-five = bau[bau$issY==2005,]
-six = bau[bau$issY==2006,]
-seven = bau[bau$issY==2007,]
-eight = bau[bau$issY==2008,]
-nine = bau[bau$issY==2009,]
-ten = bau[bau$issY==2010,]
-eleven = bau[bau$issY==2011,]
-twelve = bau[bau$issY==2012,]
-thirteen = bau[bau$issY==2013,]
-fourteen = bau[bau$issY==2014,]
+four = bau[bau$IssueYear==2004,]
+five = bau[bau$IssueYear==2005,]
+six = bau[bau$IssueYear==2006,]
+seven = bau[bau$IssueYear==2007,]
+eight = bau[bau$IssueYear==2008,]
+nine = bau[bau$IssueYear==2009,]
+ten = bau[bau$IssueYear==2010,]
+eleven = bau[bau$IssueYear==2011,]
+twelve = bau[bau$IssueYear==2012,]
+thirteen = bau[bau$IssueYear==2013,]
+fourteen = bau[bau$IssueYear==2014,]
 
 library(ggplot2)
 
@@ -471,7 +471,42 @@ ggplot(df, aes(x=Longitude, y=Latitude)) +
   geom_point(data=four, color='red', size=14, alpha=0.014)
 
 
-##a
+##DOWNTOWN PERMITS <START>
+
+downtown = subset(df, df$Longitude > -117.175 & df$Longitude < -117.135 & df$Latitude > 32.7 & df$Latitude < 32.725)
+downtown_bau = subset(downtown, downtown$Type == 'Building Permit')
+downtown_bau = downtown_bau[c('ProjectId','TimetoIssue','Latitude','Longitude','ApplicationYear','IssueYear')]
+
+
+four = downtown_bau[downtown_bau$IssueYear==2004,]
+five = downtown_bau[downtown_bau$IssueYear==2005,]
+six = downtown_bau[downtown_bau$IssueYear==2006,]
+seven = downtown_bau[downtown_bau$IssueYear==2007,]
+eight = downtown_bau[downtown_bau$IssueYear==2008,]
+nine = downtown_bau[downtown_bau$IssueYear==2009,]
+ten = downtown_bau[downtown_bau$IssueYear==2010,]
+eleven = downtown_bau[downtown_bau$IssueYear==2011,]
+twelve = downtown_bau[downtown_bau$IssueYear==2012,]
+thirteen = downtown_bau[downtown_bau$IssueYear==2013,]
+fourteen = downtown_bau[downtown_bau$IssueYear==2014,]
+
+
+ggplot(downtown, aes(x=Longitude, y=Latitude)) +
+  geom_point(color='white',size=1) +
+  theme(panel.background = element_rect(fill = "grey21"),
+        panel.grid.major = element_line(color = "grey21"),
+        panel.grid.minor = element_line(color = "grey21"),
+        plot.background = element_rect(fill = "grey21"),
+        legend.position="none",
+        axis.text = element_text(size=rel(.7), color='white'),
+        text = element_text(family='arial', face='plain', color='white', size = 14)) +
+  labs(x='LONGITUDE',y='LATITUDE', title='2013 Downtown Building Permits') + 
+  geom_point(data=thirteen, color='red', size=3, alpha = .88)
+
+
+
+
+##DOWNTOWN PERMITS <END>
 
 
 
