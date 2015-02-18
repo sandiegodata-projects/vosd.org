@@ -679,6 +679,289 @@ anova(lm(data=df, DaystoIssue~Type+square))
 
 
 
+#### Building TTI By Month
+
+bau = read.csv('bau_month.csv')
+df = read.csv('month_time_CLEANED.csv')
+
+
+df$Month_L = c(1:139)
+
+library(ggplot2)
+ggplot(data=df[df$Month_L > 103,], aes(x=Month_L, y=Median)) + geom_line()
+
+bau$app_year_month = factor(bau$app_year_month)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201201'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201202'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201203'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201204'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201205'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201206'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201207'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201208'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201209'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201210'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201211'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201212'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201301'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201302'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201303'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201304'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201305'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201306'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201307'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201308'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201309'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201310'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201311'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201312'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201401'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201402'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201403'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201404'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201405'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201406'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201407'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201408'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201409'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+qplot(bau$TimetoIssue[bau$app_year_month == '201410'], binwidth=10) + 
+  xlim(0,900) + 
+  ylim(0,100)
+
+max(bau$TimetoIssue[bau$app_year_month == '201410'])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
