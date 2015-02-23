@@ -964,7 +964,3 @@ max(bau$TimetoIssue[bau$app_year_month == '201410'])
 
 
 
-
-
-
-
