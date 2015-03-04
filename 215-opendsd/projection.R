@@ -1,5 +1,5 @@
 setwd("~/vosd.org/215-opendsd")
-df = read.csv('bayes_data.csv')
+df = read.csv('bayes_data_BP.csv')
 #df = subset(df,df$Type == 'Conditional Use Permit')
 df$X = NULL
 
@@ -343,7 +343,7 @@ overall
 plot = data.frame(year=overall$year, forty = overall$forty, fifty = overall$fifty, sixty = overall$sixty)
 
 #write.csv(plot, '/home/damoncrockett/vosd.org/215-opendsd/tiles_CUP.csv')
-write.csv(overall, '/home/damoncrockett/vosd.org/215-opendsd/tiles_overall.csv')
+#write.csv(overall, '/home/damoncrockett/vosd.org/215-opendsd/tiles_overall_BP.csv')
 
 
 
