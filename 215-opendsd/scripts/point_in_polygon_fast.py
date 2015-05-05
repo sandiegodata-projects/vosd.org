@@ -37,7 +37,7 @@ cpa_polygons = pd.DataFrame(coords_names(placemks_with_polygons).items(),
 
 # import approvals
 
-d = pd.read_csv('/Users/damoncrockett/vosd.org/215-opendsd/approvals_parcels.csv',low_memory=False)
+d = pd.read_csv('/Users/damoncrockett/vosd.org/215-opendsd/tables/approval_master_FULL.csv',low_memory=False)
 d = d[d.Latitude.notnull()]
 d.reset_index(drop=True, inplace=True)
 
@@ -72,7 +72,7 @@ for i in range(m):
     hoods.append(tmp)
     
 d['CPA'] = hoods
-d.to_csv('/Users/damoncrockett/vosd.org/215-opendsd/approvals_parcels_CPA.csv', encoding='utf-8')
+d.to_csv('/Users/damoncrockett/vosd.org/215-opendsd/tables/approvals_CPA.csv', encoding='utf-8')
 
 
 
